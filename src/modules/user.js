@@ -63,7 +63,6 @@ function user(state = initialState, action) {
                 ...state,
                 user: {
                     ...action.payload,
-                    avatar: `${process.env.REACT_APP_API_URL}/user/${action.payload._id}/avatar?d=${new Date().getTime()}`
                 }
             }
         case Types.LOGIN_SUCCESS:
@@ -74,7 +73,6 @@ function user(state = initialState, action) {
                 ...state,
                 user: {
                     ...user,
-                    avatar: `${process.env.REACT_APP_API_URL}/user/${user._id}/avatar?d=${new Date().getTime()}`
                 }
             }
         case Types.UPDATE_USER_SUCCESS:
@@ -82,7 +80,6 @@ function user(state = initialState, action) {
                 ...state,
                 user: {
                     ...action.payload.data,
-                    avatar: `${process.env.REACT_APP_API_URL}/user/${action.payload.data._id}/avatar?d=${new Date().getTime()}`
                 }
             }
         case Types.UPLOAD_AVATAR_SUCCESS:
@@ -90,7 +87,6 @@ function user(state = initialState, action) {
                 ...state,
                 user: {
                     ...state.user,
-                    avatar: `${process.env.REACT_APP_API_URL}/user/${state.user._id}/avatar?d=${new Date().getTime()}`
                 }
             }
         case Types.REMOVE_USER_SUCCESS:

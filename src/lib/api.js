@@ -1,7 +1,7 @@
 import { eventChannel } from 'redux-saga';
 import { call, take } from 'redux-saga/effects';
+import { v4 as uuid } from 'uuid'
 import { app } from '..';
-import client from './client'
 
 const onAuthChanged = () => eventChannel(emit => {
     const authChannel = app.auth().onAuthStateChanged(user => {
@@ -69,7 +69,19 @@ export const updateUser = async ({ name, password }) => {
     const { displayName, email, photoURL, emailVerified } = app.auth().currentUser;
     return { name: displayName, email, avatar: photoURL, emailVerified }
 }
-export const uploadAvatar = (formData) => client('user/me/avatar', { body: formData })
+
+export const uploadAvatar = async (file) => {
+    const user = app.auth().currentUser
+    const storageRef = app.storage().ref(`${uuid()}-${file.type}`);
+    return storageRef.put(file).then(async (snapshot) => {
+        const avatar = await snapshot.ref.getDownloadURL()
+        await user.updateProfile({
+            photoURL: avatar
+        })
+        const { displayName, email, photoURL, emailVerified } = app.auth().currentUser;
+        return { name: displayName, email, avatar: photoURL, emailVerified }
+    });
+}
 export const removeUser = () => app.auth().currentUser.delete()
 
 export const getTasks = function* () {

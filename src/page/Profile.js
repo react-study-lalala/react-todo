@@ -31,7 +31,7 @@ const Profile = () => {
     const { value: password, onChange: onChangePassword } = useInput('')
     const { value: age, onChange: onChangeAge, setValue: setAge } = useInput(0)
 
-    const upload = useCallback((formData) => dispatch(uploadAvatar(formData)), [dispatch])
+    const upload = useCallback((file) => dispatch(uploadAvatar(file)), [dispatch])
     const onLoadUser = useCallback(() => dispatch(getUser()), [dispatch])
     const onUpdateUser = useCallback((data) => dispatch(updateUser(data)), [dispatch])
 
@@ -63,9 +63,7 @@ const Profile = () => {
 
     useEffect(() => {
         if (file) {
-            const formData = new FormData();
-            formData.append('avatar', file);
-            upload(formData)
+            upload(file)
         }
     }, [file, upload])
 

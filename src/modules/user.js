@@ -34,7 +34,7 @@ export const registerSaga = createRequestSaga(Types.REGISTER, api.register, true
 export const updateUser = ({ name, password, age }) => ({ type: Types.UPDATE_USER, payload: { name, password, age } })
 export const updateUserSaga = createRequestSaga(Types.UPDATE_USER, api.updateUser)
 
-export const uploadAvatar = (formData) => ({ type: Types.UPLOAD_AVATAR, payload: formData })
+export const uploadAvatar = (file) => ({ type: Types.UPLOAD_AVATAR, payload: file })
 export const uploadAvatarSaga = createRequestSaga(Types.UPLOAD_AVATAR, api.uploadAvatar)
 
 export const removeUser = () => ({ type: Types.REMOVE_USER })
@@ -84,7 +84,7 @@ function user(state = initialState, action) {
             return {
                 ...state,
                 user: {
-                    ...state.user,
+                    ...action.payload
                 }
             }
         case Types.REMOVE_USER_SUCCESS:

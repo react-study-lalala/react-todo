@@ -117,4 +117,8 @@ export const updateTask = async ({ id, description, completed }) => {
     await todo.update(updateObj)
     return updateObj
 }
-export const removeTask = (id) => client(`task/${id}`, { method: 'DELETE' })
+export const removeTask = async (id) => {
+    const uid = app.auth().currentUser.uid
+    const todo = app.database().ref(`todos/${uid}/${id}`)
+    await todo.remove()
+}

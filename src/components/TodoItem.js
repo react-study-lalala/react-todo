@@ -29,7 +29,7 @@ const TodoItem = ({ id, completed, description }) => {
     const dispatch = useDispatch()
 
     const onUpdateTask = useCallback((data) => dispatch(updateTask(data)), [dispatch])
-    const onChangeChecked = useCallback((e) => dispatch(updateTask({ id, completed: e.target.checked })), [id, dispatch])
+    const onChangeChecked = useCallback((e) => dispatch(updateTask({ id, description, completed: e.target.checked })), [id, description, dispatch])
     const onRemove = useCallback(() => {
         if (window.confirm('정말 삭제하시겠습니까?')) dispatch(removeTask(id))
     }, [id, dispatch])
@@ -52,7 +52,7 @@ const TodoItem = ({ id, completed, description }) => {
     return <TodoWrapper>
         <Checkbox>
             <input id={id} type="checkbox" onChange={onChangeChecked} checked={completed} />
-            <label htmlFor={id}>{completed ? '☑️' : '✅'}</label>
+            <label htmlFor={id}>{completed ? '✅' : '☑️'}</label>
         </Checkbox>
         {isModifying
             ? <Input type="text" onChange={onChangeText} onKeyDown={onKeyDown} value={text} />

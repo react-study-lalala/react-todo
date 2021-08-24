@@ -77,7 +77,7 @@ function user(state = initialState, action) {
             return {
                 ...state,
                 user: {
-                    ...action.payload.data,
+                    ...action.payload,
                 }
             }
         case Types.UPLOAD_AVATAR_SUCCESS:

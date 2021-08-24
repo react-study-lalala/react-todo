@@ -56,6 +56,7 @@ function App() {
 
   useEffect(() => {
     if (token || user) setIsLoggedIn(true)
+    else setIsLoggedIn(false)
   }, [token, user])
 
   useEffect(() => {

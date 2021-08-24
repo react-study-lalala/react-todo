@@ -6,7 +6,7 @@ import client from './client'
 export const getUser = function* () {
     const onAuthChanged = () => eventChannel(emit => {
         const authChannel = app.auth().onAuthStateChanged(user => {
-            emit(user)
+            if (user) emit(user)
             return () => authChannel.close()
         })
         return authChannel
@@ -55,9 +55,21 @@ export const register = ({ name, email, password, age }) => app
         }
     })
 
-export const updateUser = ({ name, password, age }) => client('user/me', { method: 'PUT', body: { name, password, age } })
+export const updateUser = async ({ name, password }) => {
+    const user = app.auth().currentUser
+    if (name) {
+        await user.updateProfile({
+            displayName: name
+        })
+    }
+    if (password) {
+        await user.updatePassword(password)
+    }
+    const { displayName, email, photoURL, emailVerified } = app.auth().currentUser;
+    return { name: displayName, email, avatar: photoURL, emailVerified }
+}
 export const uploadAvatar = (formData) => client('user/me/avatar', { body: formData })
-export const removeUser = () => client('user/me', { method: 'DELETE' })
+export const removeUser = () => app.auth().currentUser.delete()
 
 export const getTasks = () => client('task')
 export const addTask = ({ description }) => client('task', { body: { description } })

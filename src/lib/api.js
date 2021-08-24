@@ -1,12 +1,34 @@
+import { eventChannel } from 'redux-saga';
+import { call, take } from 'redux-saga/effects';
 import { app } from '..';
 import client from './client'
 
-export const getUser = () => {
-    const { displayName: name, email, photoURL: avatar, emailVerified } = app.auth().currentUser
-    return {
-        name, email, avatar, emailVerified
+export const getUser = function* () {
+    const onAuthChanged = () => eventChannel(emit => {
+        const authChannel = app.auth().onAuthStateChanged(user => {
+            emit(user)
+            return () => authChannel.close()
+        })
+        return authChannel
+    })
+
+    const chan = yield call(onAuthChanged)
+    try {
+        while (true) {
+            // take(END) will cause the saga to terminate by jumping to the finally block
+            let user = yield take(chan)
+            const { displayName: name, email, photoURL: avatar, emailVerified } = user
+            return {
+                name, email, avatar, emailVerified
+            }
+        }
+    } catch (e) {
+        throw e
+    } finally {
+        console.log('user terminated')
     }
 }
+
 export const login = ({ email, password }) => client('user/login', { body: { email, password } })
 export const logout = () => client('user/logout', { method: 'POST' })
 export const register = ({ name, email, password, age }) => app

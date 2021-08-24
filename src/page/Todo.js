@@ -40,9 +40,9 @@ const Todo = () => {
             </form>
         </section>
         <ul>
-            {tasks.map?.(({ _id, completed, description }) => <TodoItem
-                key={_id}
-                id={_id}
+            {tasks.map?.(({ id, completed, description }) => <TodoItem
+                key={id}
+                id={id}
                 completed={completed}
                 description={description} />)}
         </ul>

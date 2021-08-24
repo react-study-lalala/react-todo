@@ -41,7 +41,7 @@ const TodoItem = ({ id, completed, description }) => {
     }
 
     const onUpdate = () => {
-        onUpdateTask({ id, description: text })
+        onUpdateTask({ id, completed, description: text })
         onToggle()
     }
 

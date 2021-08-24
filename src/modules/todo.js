@@ -14,7 +14,7 @@ export const Types = {
 }
 
 export const getTasks = () => ({ type: Types.GET_TASKS })
-export const getTasksSaga = createRequestSaga(Types.GET_TASKS, api.getTasks, true)
+export const getTasksSaga = createRequestSaga(Types.GET_TASKS, api.getTasks)
 
 export const addTask = ({ description }) => ({ type: Types.ADD_TASK, payload: { description } })
 export const addTaskSaga = createRequestSaga(Types.ADD_TASK, api.addTask)
@@ -42,23 +42,23 @@ const initialState = {
 function todo(state = initialState, action) {
     switch (action.type) {
         case Types.GET_TASKS_SUCCESS:
-            return { ...state, tasks: action.payload.data, count: action.payload.count }
+            return { ...state, tasks: action.payload, count: action.payload.length }
         case Types.ADD_TASK_SUCCESS:
-            return { ...state, tasks: [...state.tasks, action.payload.data], count: state.count + 1 }
+            return { ...state, tasks: [...state.tasks, action.payload], count: state.count + 1 }
         case Types.UPDATE_TASK:
             return {
                 ...state,
-                tasks: state.tasks.map(task => (task._id === action.payload.id) ? Object.assign(task, action.payload) : task)
+                tasks: state.tasks.map(task => (task.id === action.payload.id) ? Object.assign(task, action.payload) : task)
             }
         case Types.UPDATE_TASK_SUCCESS:
             return {
                 ...state,
-                tasks: state.tasks.map(task => task._id === action.payload.data._id ? action.payload.data : task)
+                tasks: state.tasks.map(task => task.id === action.payload.id ? action.payload : task)
             }
         case Types.REMOVE_TASK_SUCCESS:
             return {
                 ...state,
-                tasks: state.tasks.filter(task => task._id !== action.params)
+                tasks: state.tasks.filter(task => task.id !== action.params)
             }
         default:
             return state

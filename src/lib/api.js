@@ -29,7 +29,15 @@ export const getUser = function* () {
     }
 }
 
-export const login = ({ email, password }) => client('user/login', { body: { email, password } })
+export const login = ({ email, password }) => app.auth().signInWithEmailAndPassword(email, password).then(async userCredential => {
+    const token = await userCredential.user.getIdToken()
+    const { displayName, email, photoURL, emailVerified } = userCredential.user;
+    return {
+        user: { name: displayName, email, avatar: photoURL, emailVerified },
+        token
+    }
+})
+
 export const logout = () => client('user/logout', { method: 'POST' })
 export const register = ({ name, email, password, age }) => app
     .auth()

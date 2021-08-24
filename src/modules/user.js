@@ -71,9 +71,7 @@ function user(state = initialState, action) {
             window.localStorage.setItem('token', `Bearer ${token}`)
             return {
                 ...state,
-                user: {
-                    ...user,
-                }
+                user
             }
         case Types.UPDATE_USER_SUCCESS:
             return {

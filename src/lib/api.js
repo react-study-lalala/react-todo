@@ -38,7 +38,7 @@ export const login = ({ email, password }) => app.auth().signInWithEmailAndPassw
     }
 })
 
-export const logout = () => client('user/logout', { method: 'POST' })
+export const logout = () => app.auth().signOut()
 export const register = ({ name, email, password, age }) => app
     .auth()
     .createUserWithEmailAndPassword(email, password)

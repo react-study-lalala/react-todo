@@ -9,7 +9,6 @@ import React, { useCallback } from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
-import useLocalStorage from "./lib/useLocalStorage"
 import { getUser, Types } from './modules/user'
 import useFetchInfo from "./lib/useFetchInfo";
 import styled from "styled-components";
@@ -51,19 +50,18 @@ function App() {
   const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
   const onLoadUser = useCallback(() => dispatch(getUser()), [dispatch])
-  const [token] = useLocalStorage('token');
   const { isFetched } = useFetchInfo(Types.GET_USER)
 
   useEffect(() => {
-    if (token || user) setIsLoggedIn(true)
+    if (user) setIsLoggedIn(true)
     else setIsLoggedIn(false)
-  }, [token, user])
+  }, [user])
 
   useEffect(() => {
-    if (!isFetched && token) {
+    if (!isFetched) {
       onLoadUser()
     }
-  }, [onLoadUser, isFetched, token])
+  }, [onLoadUser, isFetched])
 
   return (<>
     <Header>

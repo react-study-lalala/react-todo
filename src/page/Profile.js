@@ -17,6 +17,7 @@ const Avatar = styled.img`
     height: 10rem;
     border-radius: 50%;
     background: #eee;
+    object-fit: cover;
 `
 
 const Profile = () => {

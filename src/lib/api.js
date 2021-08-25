@@ -1,18 +1,21 @@
 import { eventChannel } from 'redux-saga';
 import { call, take } from 'redux-saga/effects';
 import { v4 as uuid } from 'uuid'
-import { app } from '..';
+import { fb } from './getFirebaseClient';
 
-const onAuthChanged = () => eventChannel(emit => {
-    const authChannel = app.auth().onAuthStateChanged(user => {
-        if (user) emit(user)
-        return () => authChannel.close()
+
+const onAuthChanged = function* () {
+    const app = yield fb()
+    return eventChannel(emit => {
+        const authChannel = app.auth().onAuthStateChanged(user => {
+            if (user) emit(user)
+            return () => authChannel.close()
+        })
+        return authChannel
     })
-    return authChannel
-})
+}
 
 export const getUser = function* () {
-
     const chan = yield call(onAuthChanged)
     try {
         while (true) {
@@ -30,47 +33,58 @@ export const getUser = function* () {
     }
 }
 
-export const login = ({ email, password }) => app.auth().signInWithEmailAndPassword(email, password).then(async userCredential => {
-    const token = await userCredential.user.getIdToken()
-    const { displayName, email, photoURL, emailVerified } = userCredential.user;
-    return {
-        user: { name: displayName, email, avatar: photoURL, emailVerified },
-        token
-    }
-})
-
-export const logout = () => app.auth().signOut()
-export const register = ({ name, email, password, age }) => app
-    .auth()
-    .createUserWithEmailAndPassword(email, password)
-    .then(async (userCredential) => {
+export const login = function* ({ email, password }) {
+    const app = yield fb()
+    return app.auth().signInWithEmailAndPassword(email, password).then(async userCredential => {
         const token = await userCredential.user.getIdToken()
-        await userCredential.user.updateProfile({
-            displayName: name,
-            photoURL: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
-        })
         const { displayName, email, photoURL, emailVerified } = userCredential.user;
         return {
             user: { name: displayName, email, avatar: photoURL, emailVerified },
             token
         }
     })
+}
 
-export const updateUser = async ({ name, password }) => {
+export const logout = function* () {
+    const app = yield fb()
+    return app.auth().signOut()
+}
+export const register = function* ({ name, email, password, age }) {
+    const app = yield fb()
+    return app
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(async (userCredential) => {
+            const token = await userCredential.user.getIdToken()
+            await userCredential.user.updateProfile({
+                displayName: name,
+                photoURL: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+            })
+            const { displayName, email, photoURL, emailVerified } = userCredential.user;
+            return {
+                user: { name: displayName, email, avatar: photoURL, emailVerified },
+                token
+            }
+        })
+}
+
+export const updateUser = function* ({ name, password }) {
+    const app = yield fb()
     const user = app.auth().currentUser
     if (name) {
-        await user.updateProfile({
+        yield user.updateProfile({
             displayName: name
         })
     }
     if (password) {
-        await user.updatePassword(password)
+        yield user.updatePassword(password)
     }
     const { displayName, email, photoURL, emailVerified } = app.auth().currentUser;
     return { name: displayName, email, avatar: photoURL, emailVerified }
 }
 
-export const uploadAvatar = async (file) => {
+export const uploadAvatar = function* (file) {
+    const app = yield fb()
     const user = app.auth().currentUser
     const storageRef = app.storage().ref(`${uuid()}-${file.type}`);
     return storageRef.put(file).then(async (snapshot) => {
@@ -82,9 +96,13 @@ export const uploadAvatar = async (file) => {
         return { name: displayName, email, avatar: photoURL, emailVerified }
     });
 }
-export const removeUser = () => app.auth().currentUser.delete()
+export const removeUser = function* () {
+    const app = yield fb()
+    return app.auth().currentUser.delete()
+}
 
 export const getTasks = function* () {
+    const app = yield fb()
     const chan = yield call(onAuthChanged)
     try {
         while (true) {
@@ -107,7 +125,8 @@ export const getTasks = function* () {
         console.log('todos terminated')
     }
 }
-export const addTask = async ({ description }) => {
+export const addTask = function* ({ description }) {
+    const app = yield fb()
     const uid = app.auth().currentUser.uid
     const todo = app.database().ref(`todos/${uid}`).push()
     const updateObj = {
@@ -115,10 +134,12 @@ export const addTask = async ({ description }) => {
         completed: false,
         description
     }
-    await todo.set(updateObj)
+    yield todo.set(updateObj)
     return updateObj
 }
-export const updateTask = async ({ id, description, completed }) => {
+
+export const updateTask = function* ({ id, description, completed }) {
+    const app = yield fb()
     const uid = app.auth().currentUser.uid
     const todo = app.database().ref(`todos/${uid}/${id}`)
     const updateObj = {
@@ -126,11 +147,13 @@ export const updateTask = async ({ id, description, completed }) => {
         completed,
         description
     }
-    await todo.update(updateObj)
+    yield todo.update(updateObj)
     return updateObj
 }
-export const removeTask = async (id) => {
+
+export const removeTask = function* (id) {
+    const app = yield fb()
     const uid = app.auth().currentUser.uid
     const todo = app.database().ref(`todos/${uid}/${id}`)
-    await todo.remove()
+    yield todo.remove()
 }

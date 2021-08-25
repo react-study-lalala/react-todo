@@ -1,10 +1,4 @@
 import { Switch, Route } from "react-router-dom";
-import Register from './page/Register'
-import Login from './page/Login'
-import Logout from './page/Logout'
-import Profile from './page/Profile'
-import Todo from './page/Todo'
-
 import React, { useCallback } from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -12,6 +6,8 @@ import { Link } from "react-router-dom"
 import { getUser, Types } from './modules/user'
 import useFetchInfo from "./lib/useFetchInfo";
 import styled from "styled-components";
+import lazyIdle from "./lib/lazyIdle";
+
 const Header = styled.header`
     display: flex;
     justify-content: space-between;
@@ -38,11 +34,11 @@ const Navigation = styled.nav`
 `
 
 const routes = [
-  { path: '/register', component: Register },
-  { path: '/login', component: Login },
-  { path: '/logout', component: Logout },
-  { path: '/profile', component: Profile },
-  { path: '/todo', component: Todo },
+  { path: '/register', component: lazyIdle(() => import('./page/Register')) },
+  { path: '/login', component: lazyIdle(() => import('./page/Login')) },
+  { path: '/logout', component: lazyIdle(() => import('./page/Logout')) },
+  { path: '/profile', component: lazyIdle(() => import('./page/Profile')) },
+  { path: '/todo', component: lazyIdle(() => import('./page/Todo')) },
 ]
 
 function App() {

@@ -2,36 +2,43 @@ import { Switch, Route } from "react-router-dom";
 import React, { useCallback } from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link } from "react-router-dom"
 import { getUser, Types } from './modules/user'
 import useFetchInfo from "./lib/useFetchInfo";
-import styled from "styled-components";
 import lazyIdle from "./lib/lazyIdle";
 
-const Header = styled.header`
-    display: flex;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    font-size: 2rem;
-    margin: 1rem;
-`
+import {
+  makeStyles,
+  AppBar,
+  SwipeableDrawer,
+  ListItem,
+  Toolbar,
+  IconButton,
+  Typography,
+  Link,
+  List,
+  ListItemIcon,
+  ListItemText
+} from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
 
-const Navigation = styled.nav`
-    ul {
-        display: flex;
-        li {
-            margin: auto 1rem;
-            a {
-              color: inherit;
-              text-decoration: none;
-              &:hover {
-                background: #eee;
-              }
-            }
-        }
-    }    
-`
+import MenuIcon from '@material-ui/icons/Menu';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
 
 const routes = [
   { path: '/register', component: lazyIdle(() => import('./page/Register')) },
@@ -43,10 +50,17 @@ const routes = [
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [toggle, setToggle] = useState(false)
   const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
   const onLoadUser = useCallback(() => dispatch(getUser()), [dispatch])
   const { isFetched } = useFetchInfo(Types.GET_USER)
+  const classes = useStyles();
+
+  const toggleDrawer = (val) => () => {
+    setToggle(val);
+  };
+
 
   useEffect(() => {
     if (user) setIsLoggedIn(true)
@@ -60,23 +74,43 @@ function App() {
   }, [onLoadUser, isFetched])
 
   return (<>
-    <Header>
-      {user ? <span>{user.name}'s Todo</span> : <span>Todo App</span>}
-      <Navigation>
-        <ul>
-          {
-            (!isLoggedIn ? [
-              { path: '/register', name: '회원가입' },
-              { path: '/login', name: '로그인' },
-            ] : [
-              { path: '/profile', name: '프로필' },
-              { path: '/todo', name: '할일' },
-              { path: '/logout', name: '로그아웃' },
-            ]).map(({ path, name }) => <li key={path}><Link to={path}>{name}</Link></li>)
-          }
-        </ul>
-      </Navigation>
-    </Header>
+    <AppBar position="static">
+      <Toolbar>
+        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h6" className={classes.title}>
+          {user ? <Typography>{user.name}'s Todo</Typography> : <Typography>Todo App</Typography>}
+        </Typography>
+        <Link color="inherit" component={RouterLink} to={!isLoggedIn ? '/login' : '/logout'} >
+          {!isLoggedIn ? '로그인' : '로그아웃'}
+        </Link>
+      </Toolbar>
+    </AppBar>
+    <SwipeableDrawer
+      anchor="left"
+      open={toggle}
+      onClose={toggleDrawer(false)}
+      onOpen={toggleDrawer(true)}
+    >
+      <List>
+        {
+          (!isLoggedIn ? [
+            { path: '/register', name: '회원가입', icon: PersonAddIcon },
+            { path: '/login', name: '로그인', icon: VpnKeyIcon },
+          ] : [
+            { path: '/profile', name: '프로필', icon: AccountBoxIcon },
+            { path: '/todo', name: '할일', icon: AssignmentTurnedInIcon },
+            { path: '/logout', name: '로그아웃', icon: ExitToAppIcon },
+          ]).map(({ path, name, icon: Icon }) =>
+            <ListItem button key={path} component={RouterLink} to={path}>
+              <ListItemIcon><Icon /></ListItemIcon>
+              <ListItemText primary={name} />
+            </ListItem>
+          )
+        }
+      </List>
+    </SwipeableDrawer>
     <Switch>
       {routes.map(({ path, exact, component: Component }) => <Route key={path} path={path} exact={exact}><Component /></Route>)}
     </Switch>

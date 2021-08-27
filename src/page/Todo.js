@@ -5,7 +5,7 @@ import useInput from "../lib/useInput"
 import TodoItem from '../components/TodoItem'
 import useFetchInfo from "../lib/useFetchInfo"
 import { Types } from '../modules/todo'
-import { Box, Button, Container, IconButton, TextField } from "@material-ui/core"
+import { Box, Container, IconButton, TextField } from "@material-ui/core"
 import { AddCircle } from "@material-ui/icons"
 
 const Todo = () => {

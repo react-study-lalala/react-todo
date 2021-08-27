@@ -5,9 +5,8 @@ import useInput from "../lib/useInput"
 import TodoItem from '../components/TodoItem'
 import useFetchInfo from "../lib/useFetchInfo"
 import { Types } from '../modules/todo'
-import Input from "../components/Input"
-import Button from "../components/Button"
-import Wrapper from "../components/Wrapper"
+import { Box, Button, Container, IconButton, TextField } from "@material-ui/core"
+import { AddCircle } from "@material-ui/icons"
 
 const Todo = () => {
     const dispatch = useDispatch()
@@ -32,13 +31,22 @@ const Todo = () => {
         if (!isFetched) onLoadTask()
     }, [onLoadTask, isFetched])
 
-    return <Wrapper>
-        <section>
+    return <Container maxWidth="md">
+        <Box component='section' textAlign="center">
             <form onSubmit={onSubmit}>
-                <Input type="text" value={text} onChange={onChangeText} autoFocus placeholder="할 일 입력..." />
-                <Button type="submit">➕</Button>
+                <TextField
+                    value={text}
+                    onChange={onChangeText} autoFocus
+                    placeholder="할 일 입력..."
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                        endAdornment: <IconButton type="submit" color="primary">
+                            <AddCircle />
+                        </IconButton>
+                    }} />
             </form>
-        </section>
+        </Box>
         <ul>
             {tasks.map?.(({ id, completed, description }) => <TodoItem
                 key={id}
@@ -46,7 +54,7 @@ const Todo = () => {
                 completed={completed}
                 description={description} />)}
         </ul>
-    </Wrapper>
+    </Container>
 }
 
 export default React.memo(Todo)

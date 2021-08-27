@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import useInput from "../lib/useInput"
 import { removeTask, updateTask } from "../modules/todo"
-import Input from "../components/Input"
-import Button from "../components/Button"
+import { Button, Checkbox, TextField } from "@material-ui/core"
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
 const TodoWrapper = styled.li`
     display: flex;
@@ -15,12 +15,6 @@ const TodoWrapper = styled.li`
     padding: 1rem;
     border: 1px solid;
     font-size: 2rem;
-`;
-
-const Checkbox = styled.div`
-    input[type=checkbox] {
-        display: none;
-    }
 `;
 
 const TodoItem = ({ id, completed, description }) => {
@@ -50,12 +44,9 @@ const TodoItem = ({ id, completed, description }) => {
     }
 
     return <TodoWrapper>
-        <Checkbox>
-            <input id={id} type="checkbox" onChange={onChangeChecked} checked={completed} />
-            <label htmlFor={id}>{completed ? '✅' : '☑️'}</label>
-        </Checkbox>
+        <Checkbox color="primary" onChange={onChangeChecked} checked={completed} />
         {isModifying
-            ? <Input type="text" onChange={onChangeText} onKeyDown={onKeyDown} value={text} />
+            ? <ClickAwayListener onClickAway={onToggle}><TextField onChange={onChangeText} onKeyDown={onKeyDown} value={text} variant="outlined" /></ClickAwayListener>
             : <span onClick={onToggle}>{description}</span>}
         <div>
             {isModifying && <Button type="button" onClick={onUpdate}>💾</Button>}

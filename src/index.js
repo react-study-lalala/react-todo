@@ -2,16 +2,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import rootReducer, { rootSaga } from './modules'
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga'
+import { createBrowserHistory } from 'history';
 
 const logger = createLogger()
-const sagaMiddleware = createSagaMiddleware()
+const customHistory = createBrowserHistory();
+
+const sagaMiddleware = createSagaMiddleware({
+  context: {
+    history: customHistory
+  }
+});
 const store = createStore(rootReducer, composeWithDevTools(
   applyMiddleware(logger, sagaMiddleware)
 ))
@@ -19,11 +26,11 @@ sagaMiddleware.run(rootSaga)
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <Router history={customHistory}>
       <Provider store={store}>
         <App />
       </Provider>
-    </BrowserRouter>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -2,6 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { call, take } from 'redux-saga/effects';
 import { v4 as uuid } from 'uuid'
 import { fb } from './getFirebaseClient';
+import { push } from './historyUtils';
 
 
 const onAuthChanged = function* () {
@@ -35,37 +36,37 @@ export const getUser = function* () {
 
 export const login = function* ({ email, password }) {
     const app = yield fb()
-    return app.auth().signInWithEmailAndPassword(email, password).then(async userCredential => {
-        const token = await userCredential.user.getIdToken()
-        const { displayName, email, photoURL, emailVerified } = userCredential.user;
-        return {
-            user: { name: displayName, email, avatar: photoURL, emailVerified },
-            token
-        }
-    })
+    const userCredential = yield app.auth().signInWithEmailAndPassword(email, password)
+    const token = yield userCredential.user.getIdToken()
+    const user = userCredential.user;
+    yield push('/todo');
+    return {
+        user: { name: user.displayName, email: user.email, avatar: user.photoURL, emailVerified: user.emailVerified },
+        token
+    }
 }
 
 export const logout = function* () {
     const app = yield fb()
-    return app.auth().signOut()
+    app.auth().signOut()
+    yield push('/');
 }
 export const register = function* ({ name, email, password, age }) {
     const app = yield fb()
-    return app
+    const userCredential = yield app
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(async (userCredential) => {
-            const token = await userCredential.user.getIdToken()
-            await userCredential.user.updateProfile({
-                displayName: name,
-                photoURL: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
-            })
-            const { displayName, email, photoURL, emailVerified } = userCredential.user;
-            return {
-                user: { name: displayName, email, avatar: photoURL, emailVerified },
-                token
-            }
-        })
+    const token = yield userCredential.user.getIdToken()
+    yield userCredential.user.updateProfile({
+        displayName: name,
+        photoURL: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+    })
+    const user = userCredential.user;
+    yield push('/');
+    return {
+        user: { name: user.displayName, email: user.email, avatar: user.photoURL, emailVerified: user.emailVerified },
+        token
+    }
 }
 
 export const updateUser = function* ({ name, password }) {
@@ -98,7 +99,8 @@ export const uploadAvatar = function* (file) {
 }
 export const removeUser = function* () {
     const app = yield fb()
-    return app.auth().currentUser.delete()
+    app.auth().currentUser.delete()
+    yield push('/');
 }
 
 export const getTasks = function* () {

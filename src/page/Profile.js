@@ -3,7 +3,6 @@ import useFile from "../lib/useFile"
 import React, { useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { getUser, updateUser, uploadAvatar, removeUser, Types } from '../modules/user'
-import { useHistory } from "react-router-dom"
 import useFetchInfo from "../lib/useFetchInfo"
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
@@ -24,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
 const Profile = () => {
     const user = useSelector(state => state.user.user)
     const dispatch = useDispatch()
-    const history = useHistory()
     const { isFetched } = useFetchInfo(Types.GET_USER)
     const classes = useStyles();
 
@@ -45,7 +43,7 @@ const Profile = () => {
     const onRemoveUser = () => {
         if (window.confirm('Do you want to remove this account?')) {
             dispatch(removeUser())
-            history.push('/')
+            // history.push('/')
         }
     }
 

@@ -1,7 +1,6 @@
 import useInput from '../lib/useInput'
 import { useDispatch } from "react-redux"
 import { register } from '../modules/user'
-import { useHistory } from 'react-router-dom'
 import React, { useCallback, useState } from 'react'
 import { Button, Container, IconButton, TextField } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons'
@@ -12,14 +11,12 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false)
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const onRegister = useCallback(data => dispatch(register(data)), [dispatch])
 
     async function onSubmit(e) {
         e.preventDefault();
         try {
             onRegister({ name, email, password })
-            history.push('/')
         } catch (error) {
             console.log(error)
             alert(error)

@@ -46,10 +46,9 @@ const TodoItem = ({ id, completed, description }) => {
     return <TodoWrapper>
         <Checkbox color="primary" onChange={onChangeChecked} checked={completed} />
         {isModifying
-            ? <ClickAwayListener onClickAway={onToggle}><TextField onChange={onChangeText} onKeyDown={onKeyDown} value={text} variant="outlined" /></ClickAwayListener>
+            ? <ClickAwayListener onClickAway={onUpdate}><TextField onChange={onChangeText} onKeyDown={onKeyDown} value={text} variant="outlined" /></ClickAwayListener>
             : <span onClick={onToggle}>{description}</span>}
         <div>
-            {isModifying && <Button type="button" onClick={onUpdate}>💾</Button>}
             <Button type="button" onClick={onRemove}>❌</Button>
         </div>
     </TodoWrapper>
